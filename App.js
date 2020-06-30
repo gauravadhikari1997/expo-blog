@@ -6,11 +6,13 @@ import BlogContext from "./src/context/BlogContext";
 
 import IndexScreen from "./src/screens/IndexScreen";
 import SinglePostScreen from "./src/screens/SinglePostScreen";
+import CreatePostScreen from "./src/screens/CreatePostScreen";
 
 const navigator = createStackNavigator(
   {
     Index: IndexScreen,
     Post: SinglePostScreen,
+    Create: CreatePostScreen,
   },
   {
     initialRouteName: "Index",
@@ -28,10 +30,9 @@ export default () => {
   function ourReducer(state, action) {
     switch (action.type) {
       case "ADD_POST":
-        return [...state, { id: Math.random().toString(), title: "New Post" }];
+        return [...state, action.value];
       case "DELETE_POST":
         return state.filter((item) => item.id !== action.value);
-
       default:
         return state;
     }

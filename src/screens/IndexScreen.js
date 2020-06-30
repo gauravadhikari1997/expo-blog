@@ -4,7 +4,6 @@ import {
   Text,
   View,
   FlatList,
-  Button,
   TouchableOpacity,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -13,6 +12,7 @@ import BlogContext from "../context/BlogContext";
 
 const IndexScreen = ({ navigation }) => {
   const appContext = useContext(BlogContext);
+
   return (
     <View>
       <FlatList
@@ -45,13 +45,18 @@ const IndexScreen = ({ navigation }) => {
           );
         }}
       />
-      <Button
-        style={styles.button}
-        title="Add new post"
-        onPress={() => appContext.dispatch({ type: "ADD_POST" })}
-      />
     </View>
   );
+};
+
+IndexScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerRight: () => (
+      <TouchableOpacity onPress={() => navigation.navigate("Create")}>
+        <Feather style={{ paddingRight: 20 }} name="plus" size={30} />
+      </TouchableOpacity>
+    ),
+  };
 };
 
 const styles = StyleSheet.create({
@@ -68,7 +73,6 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 25,
   },
-  button: {},
 });
 
 export default IndexScreen;

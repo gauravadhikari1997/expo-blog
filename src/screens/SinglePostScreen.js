@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+
+import { EvilIcons } from "@expo/vector-icons";
 
 import BlogContext from "../context/BlogContext";
 
@@ -15,8 +17,24 @@ const SinglePostScreen = ({ navigation }) => {
   return (
     <View>
       <Text>{blog.title}</Text>
+      <Text>{blog.content}</Text>
     </View>
   );
+};
+
+SinglePostScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerRight: () => (
+      <TouchableOpacity onPress={() => navigation.navigate("Create")}>
+        <EvilIcons
+          style={{ paddingRight: 20 }}
+          name="pencil"
+          size={24}
+          color="black"
+        />
+      </TouchableOpacity>
+    ),
+  };
 };
 
 const styles = StyleSheet.create({});
