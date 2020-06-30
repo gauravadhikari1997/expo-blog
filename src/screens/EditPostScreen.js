@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, TextInput, Button } from "react-native";
 
 import BlogContext from "../context/BlogContext";
 
-const CreatePostScreen = ({ navigation }) => {
+const EditPostScreen = ({ navigation }) => {
   const appContext = useContext(BlogContext);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+
+  const id = navigation.getParam("id");
+  const blog = appContext.state.find((item) => item.id === id);
+  const [title, setTitle] = useState(blog.title);
+  const [content, setContent] = useState(blog.content);
 
   return (
     <View>
@@ -23,20 +26,20 @@ const CreatePostScreen = ({ navigation }) => {
       <TextInput
         autoCorrect={false}
         autoCapitalize="none"
-        style={styles.input}
-        value={content}
         multiline
         numberOfLines={20}
+        style={styles.input}
+        value={content}
         onChangeText={(newText) => setContent(newText)}
       />
       <Button
-        title="Add Post"
+        title="Save Changes"
         onPress={() => {
           appContext.dispatch({
-            type: "ADD_POST",
-            value: { id: Math.random().toString(), title, content },
+            type: "EDIT_POST",
+            value: { id, title, content },
           });
-          navigation.navigate("Index");
+          navigation.navigate("Post", { id });
         }}
       />
     </View>
@@ -57,4 +60,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePostScreen;
+export default EditPostScreen;
