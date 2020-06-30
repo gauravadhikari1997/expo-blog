@@ -39,7 +39,7 @@ const EditPostScreen = ({ navigation }) => {
             type: "EDIT_POST",
             value: { id, title, content },
           });
-          navigation.navigate("Post", { id });
+          navigation.pop();
         }}
       />
     </View>
