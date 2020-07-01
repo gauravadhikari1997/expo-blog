@@ -1,12 +1,30 @@
 import React, { useState, useContext } from "react";
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
 
+import server from "../api/server";
+
 import BlogContext from "../context/BlogContext";
 
 const CreatePostScreen = ({ navigation }) => {
   const appContext = useContext(BlogContext);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  async function handleSubmit() {
+    try {
+      const response = await server.post("/product", {
+        name: title,
+        description: content,
+      });
+      appContext.dispatch({
+        type: "ADD_POST",
+        value: response.data.product,
+      });
+      navigation.navigate("Index");
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <View>
@@ -29,16 +47,7 @@ const CreatePostScreen = ({ navigation }) => {
         numberOfLines={20}
         onChangeText={(newText) => setContent(newText)}
       />
-      <Button
-        title="Add Post"
-        onPress={() => {
-          appContext.dispatch({
-            type: "ADD_POST",
-            value: { id: Math.random().toString(), title, content },
-          });
-          navigation.navigate("Index");
-        }}
-      />
+      <Button title="Add Post" onPress={handleSubmit} />
     </View>
   );
 };

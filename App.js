@@ -1,6 +1,8 @@
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
+
+import server from "./src/api/server";
 
 import BlogContext from "./src/context/BlogContext";
 
@@ -27,24 +29,37 @@ const navigator = createStackNavigator(
 const App = createAppContainer(navigator);
 
 export default () => {
+  useEffect(() => {
+    async function getData() {
+      try {
+        const response = await server.get(`/product`);
+        dispatch({ type: "GET_POST", value: response.data });
+      } catch (e) {
+        console.log("Error occured!");
+      }
+    }
+    getData();
+  }, []);
+
   const initialState = [];
 
   function ourReducer(state, action) {
     switch (action.type) {
+      case "GET_POST":
+        return action.value;
       case "ADD_POST":
         return [...state, action.value];
       case "DELETE_POST":
-        return state.filter((item) => item.id !== action.value);
+        return state.filter((item) => item._id !== action.value);
       case "EDIT_POST":
-        return state.map((item) => {
-          if (item.id === action.value.id) {
-            const foundObj = item;
-            foundObj.title = action.value.title;
-            foundObj.content = action.value.content;
+        const foundObj = action.value;
+        const updatedState = state.map((item) => {
+          if (item._id === foundObj._id) {
             return foundObj;
           }
-          return [...state, foundObj];
+          return item;
         });
+        return updatedState;
       default:
         return state;
     }

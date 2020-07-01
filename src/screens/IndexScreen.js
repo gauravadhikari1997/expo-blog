@@ -1,4 +1,6 @@
 import React, { useContext } from "react";
+import server from "../api/server";
+
 import {
   StyleSheet,
   Text,
@@ -17,23 +19,24 @@ const IndexScreen = ({ navigation }) => {
     <View>
       <FlatList
         data={appContext.state}
-        keyExtractor={(blog) => blog.id}
+        keyExtractor={(blog) => blog._id}
         renderItem={({ item }) => {
+          async function handleDelete() {
+            await server.delete(`/product/${item._id}`);
+            appContext.dispatch({
+              type: "DELETE_POST",
+              value: item._id,
+            });
+          }
+
           return (
             <View style={styles.row}>
               <TouchableOpacity
-                onPress={() => navigation.navigate("Post", { id: item.id })}
+                onPress={() => navigation.navigate("Post", { id: item._id })}
               >
-                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.title}>{item.name}</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  appContext.dispatch({
-                    type: "DELETE_POST",
-                    value: item.id,
-                  })
-                }
-              >
+              <TouchableOpacity onPress={handleDelete}>
                 <Feather
                   style={styles.icon}
                   name="trash"

@@ -1,5 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
+
+import server from "../api/server";
 
 import BlogContext from "../context/BlogContext";
 
@@ -7,9 +9,42 @@ const EditPostScreen = ({ navigation }) => {
   const appContext = useContext(BlogContext);
 
   const id = navigation.getParam("id");
-  const blog = appContext.state.find((item) => item.id === id);
-  const [title, setTitle] = useState(blog.title);
-  const [content, setContent] = useState(blog.content);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const response = await server.get(`/product/${id}`);
+        setTitle(response.data.product[0].name);
+        setContent(response.data.product[0].description);
+      } catch (e) {
+        console.log("Error occured!");
+      }
+    }
+    getData();
+  }, [id]);
+
+  async function handleSubmit() {
+    try {
+      const response = await server.put(`/product/${id}`, {
+        name: title,
+        description: content,
+      });
+      const editedBlog = await server.get(`/product/${id}`);
+      appContext.dispatch({
+        type: "EDIT_POST",
+        value: {
+          _id: editedBlog.data.product[0]._id,
+          name: editedBlog.data.product[0].name,
+          description: editedBlog.data.product[0].description,
+        },
+      });
+      navigation.pop();
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <View>
@@ -32,16 +67,7 @@ const EditPostScreen = ({ navigation }) => {
         value={content}
         onChangeText={(newText) => setContent(newText)}
       />
-      <Button
-        title="Save Changes"
-        onPress={() => {
-          appContext.dispatch({
-            type: "EDIT_POST",
-            value: { id, title, content },
-          });
-          navigation.pop();
-        }}
-      />
+      <Button title="Save Changes" onPress={handleSubmit} />
     </View>
   );
 };

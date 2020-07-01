@@ -1,23 +1,39 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+
+import server from "../api/server";
 
 import { EvilIcons } from "@expo/vector-icons";
 
-import BlogContext from "../context/BlogContext";
-
 const SinglePostScreen = ({ navigation }) => {
   const id = navigation.getParam("id");
-  const appContext = useContext(BlogContext);
+  const [blog, setBlog] = useState({});
 
-  const blog = appContext.state.find((item) => item.id === id);
+  useEffect(() => {
+    async function getData() {
+      try {
+        const response = await server.get(`/product/${id}`);
+        setBlog(response.data.product[0]);
+      } catch (e) {
+        console.log("Error occured!");
+      }
+    }
+    getData();
+
+    const listener = navigation.addListener("didFocus", () => {
+      getData();
+    });
+
+    return () => listener.remove();
+  }, []);
 
   if (!id) {
     return null;
   }
   return (
     <View>
-      <Text style={styles.title}>{blog.title}</Text>
-      <Text style={styles.content}>{blog.content}</Text>
+      <Text style={styles.title}>{blog.name}</Text>
+      <Text style={styles.content}>{blog.description}</Text>
     </View>
   );
 };
